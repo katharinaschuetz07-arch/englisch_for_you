@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Englisch-Sprach-App</title>
+
+<style>
+
+/* =========================
+   BASIS
+========================= */
+body {
+    margin:0;
+    font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    background: radial-gradient(circle at top, #0a1a3a, #020611);
+    color:white;
+    text-align:center;
+}
+
+/* =========================
+   HEADER
+========================= */
+header {
+    padding:10px 20px;
+}
+
+h1 {
+    font-size:28px;
+    color:#ffd700;
+    margin:0;
+}
+
+.subline {
+    font-size:18px;
+    margin-top:5px;
+}
+
+.version {
+    font-size:12px;
+    opacity:0.6;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+button {
+    flex:1;
+    padding:12px;
+    background: linear-gradient(145deg,#0f2a5c,#081533);
+    border:1px solid #ffd700;
+    color:white;
+    cursor:pointer;
+    border-radius:12px;
+    margin:3px;
+}
+
+.menu-top {
+    display:flex;
+}
+
+/* =========================
+   KARTE
+========================= */
+.card {
+    margin:20px auto 8px auto; /* ↓ Abstand nach unten reduziert */
+    padding:25px;
+    width:85%;
+    max-width:630px;
+    background: linear-gradient(145deg,#0c2048,#050b1f);
+    border-radius:18px;
+    position:relative;
+}
+
+.state {
+    position:absolute;
+    top:10px;
+    left:15px;
+    font-size:12px;
+    opacity:0.7;
+}
+
+.counter {
+    position:absolute;
+    top:10px;
+    right:15px;
+    font-size:12px;
+    opacity:0.7;
+}
+
+.word { font-size:24px; color:#ffd700; margin-top:20px; }
+.phonetic { font-size:16px; opacity:0.7; }
+.translation { font-size:20px; margin-top:10px; }
+
+/* =========================
+   CONTROLS
+========================= */
+.controls {
+    display:flex;
+    margin-bottom:5px; /* ↓ enger zum Footer */
+}
+
+/* =========================
+   FOOTER (NEU SAUBER)
+========================= */
+.app-footer {
+    margin-top:10px;
+}
+
+.footer-main {
+    font-size:12px;
+    opacity:0.6;
+}
+
+.footer-small {
+    font-size:10px;
+    opacity:0.5;
+    margin-top:2px;
+}
+
+.footer-links {
+    display:flex;
+    justify-content:space-between;
+    padding:8px 20px 12px;
+    font-size:12px;
+    opacity:0.5;
+}
+
+/* =========================
+   OVERLAY
+========================= */
+.overlay {
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:black;
+    padding:20px;
+    overflow:auto;
+    color:white;
+}
+
+.overlay h2, .overlay p {
+    color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Englisch for you</h1>
+<div class="subline">© 2026 Version 2.9.7</div>
+</header>
+
+<div class="menu-top">
+<button onclick="loadCategory('basis')">Basis</button>
+<button onclick="loadCategory('alltag')">Alltag</button>
+<button onclick="loadCategory('reisen')">Reisen</button>
+<button onclick="loadCategory('essen')">Essen</button>
+</div>
+
+<div class="card" onclick="cardClick()">
+
+<div class="state" id="stateText">Basiswissen</div>
+<div class="counter" id="counterText">1 / 0</div>
+
+<div class="word" id="word"></div>
+<div class="phonetic" id="phonetic"></div>
+<div class="translation" id="translation"></div>
+
+</div>
+
+<div class="controls">
+<button onclick="prevCard()">Zurück</button>
+<button onclick="loadProverbs()">Menü</button>
+<button onclick="nextCard()">Vorwärts</button>
+</div>
+
+<!-- ✅ NEUER SAUBERER FOOTER -->
+<footer class="app-footer">
+
+<div class="footer-main">
+    <div>© 2026 Ella Pinorella Verlag</div>
+    <div class="footer-small">Premium-App V 2.9.7</div>
+</div>
+
+<div class="footer-links">
+<span onclick="openImpressum()">Impressum</span>
+<span onclick="openDatenschutz()">Datenschutz</span>
+</div>
+
+</footer>
+
+<!-- =========================
+   IMPRESSUM
+========================= -->
+<div id="impressum" class="overlay">
+<h2><b>Impressum</b></h2>
+
+<p id="impText">
+Angaben gemäß § 5 TMG <br><br> 
+Ella Pinorella Verlag <br> 
+Inhaberin: Katharina Schütz <br>
+Deutschland <br> 
+E-Mail: katharina.schuetz.07@gmail.com <br><br> 
+Verantwortlich für Aufbau & Inhalt:<br>  
+Katharina Schütz <br><br> 
+Diese Anwendung ist ein urheberrechtlich geschützter Prototyp  
+und dient ausschließlich Testzwecken. <br><br> 
+© 2026 Ella Pinorella Verlag
+</p>
+
+<button onclick="closeOverlay()">Schließen</button>
+</div>
+
+<div id="datenschutz" class="overlay">
+<h2><b>Datenschutz</b></h2>
+
+<p id="dsText">
+Diese Anwendung kann ohne Angabe personenbezogener Daten genutzt werden. <br><br> 
+Es werden keine Daten erhoben, gespeichert oder verarbeitet. <br><br> 
+Alle Inhalte werden lokal verarbeitet. <br><br> 
+Verantwortlich:<br>
+Katharina Schütz
+</p>
+
+<button onclick="closeOverlay()">Schließen</button>
+</div>
+
+<script>
+
+/* =========================
+   SPRACHE
+========================= */
+let currentLang = "en-US";
+
+/* =========================
+   DATEN
+========================= */
+const data = {
+
+basis: [
+
+{w:"How are you?",p:"[haʊ ɑːr juː]",t:"Wie geht es dir?"},
+{w:"I am fine",p:"[aɪ æm faɪn]",t:"Mir geht es gut"},
+{w:"Nice to meet you",p:"[naɪs tuː miːt juː]",t:"Freut mich"},
+{w:"What is your name?",p:"[wʌt ɪz jɔːr neɪm]",t:"Wie heißt du?"},
+{w:"My name is...",p:"[maɪ neɪm ɪz]",t:"Ich heiße..."},
+{w:"Where are you from?",p:"[weər ɑːr juː frʌm]",t:"Woher kommst du?"},
+{w:"I am from Germany",p:"[aɪ æm frʌm ˈdʒɜːrməni]",t:"Ich komme aus Deutschland"},
+
+{w:"How old are you?",p:"[haʊ oʊld ɑːr juː]",t:"Wie alt bist du?"},
+{w:"I am ... years old",p:"[aɪ æm jɪrz oʊld]",t:"Ich bin ... Jahre alt"},
+{w:"What do you do?",p:"[wʌt duː juː duː]",t:"Was machst du beruflich?"},
+{w:"I work as...",p:"[aɪ wɜːrk æz]",t:"Ich arbeite als..."},
+
+{w:"Do you speak German?",p:"[duː juː spiːk ˈdʒɜːrmən]",t:"Sprichst du Deutsch?"},
+{w:"A little",p:"[ə ˈlɪtl]",t:"Ein bisschen"},
+{w:"Fluent",p:"[ˈfluːənt]",t:"Fließend"},
+
+{w:"What time is it?",p:"[wʌt taɪm ɪz ɪt]",t:"Wie spät ist es?"},
+{w:"It is late",p:"[ɪt ɪz leɪt]",t:"Es ist spät"},
+{w:"It is early",p:"[ɪt ɪz ˈɜːrli]",t:"Es ist früh"},
+
+{w:"I am hungry",p:"[aɪ æm ˈhʌŋɡri]",t:"Ich habe Hunger"},
+{w:"I am thirsty",p:"[aɪ æm ˈθɜːrsti]",t:"Ich habe Durst"},
+{w:"I am tired",p:"[aɪ æm ˈtaɪərd]",t:"Ich bin müde"},
+
+{w:"Let’s go",p:"[lets ɡoʊ]",t:"Lass uns gehen"},
+{w:"Come here",p:"[kʌm hɪr]",t:"Komm her"},
+{w:"Wait a moment",p:"[weɪt ə ˈmoʊmənt]",t:"Einen Moment bitte"},
+{w:"Hurry up",p:"[ˈhɜːri ʌp]",t:"Beeil dich"},
+
+{w:"I agree",p:"[aɪ əˈɡriː]",t:"Ich stimme zu"},
+{w:"I disagree",p:"[aɪ ˌdɪsəˈɡriː]",t:"Ich stimme nicht zu"},
+{w:"That’s right",p:"[ðæts raɪt]",t:"Das stimmt"},
+{w:"That’s wrong",p:"[ðæts rɔːŋ]",t:"Das ist falsch"},
+
+{w:"What do you mean?",p:"[wʌt duː juː miːn]",t:"Was meinst du?"},
+{w:"I mean...",p:"[aɪ miːn]",t:"Ich meine..."},
+
+{w:"Can you help me?",p:"[kæn juː help miː]",t:"Kannst du mir helfen?"},
+{w:"I need help",p:"[aɪ niːd help]",t:"Ich brauche Hilfe"},
+{w:"No problem",p:"[noʊ ˈprɒbləm]",t:"Kein Problem"},
+
+{w:"What do you want?",p:"[wʌt duː juː wɒnt]",t:"Was möchtest du?"},
+{w:"I want this",p:"[aɪ wɒnt ðɪs]",t:"Ich möchte das"},
+{w:"I don’t want that",p:"[aɪ doʊnt wɒnt ðæt]",t:"Ich will das nicht"},
+
+{w:"How much is this?",p:"[haʊ mʌtʃ ɪz ðɪs]",t:"Wie viel kostet das?"},
+{w:"Too expensive",p:"[tuː ɪkˈspensɪv]",t:"Zu teuer"},
+{w:"Very cheap",p:"[ˈveri tʃiːp]",t:"Sehr billig"},
+
+{w:"Where is the bathroom?",p:"[weər ɪz ðə ˈbæθruːm]",t:"Wo ist die Toilette?"},
+{w:"Go straight",p:"[ɡoʊ streɪt]",t:"Geradeaus gehen"},
+{w:"Turn left",p:"[tɜːrn left]",t:"Links abbiegen"},
+{w:"Turn right",p:"[tɜːrn raɪt]",t:"Rechts abbiegen"},
+
+{w:"I like it",p:"[aɪ laɪk ɪt]",t:"Es gefällt mir"},
+{w:"I don’t like it",p:"[aɪ doʊnt laɪk ɪt]",t:"Es gefällt mir nicht"},
+{w:"Very good",p:"[ˈveri ɡʊd]",t:"Sehr gut"},
+{w:"Not bad",p:"[nɒt bæd]",t:"Nicht schlecht"},
+
+{w:"See you later",p:"[siː juː ˈleɪtər]",t:"Bis später"},
+{w:"See you tomorrow",p:"[siː juː təˈmɒroʊ]",t:"Bis morgen"},
+{w:"Take care",p:"[teɪk keər]",t:"Mach’s gut"}
+
+],
+
+
+alltag: [
+
+
+{w:"Good morning",t:"Guten Morgen"},
+{w:"Good afternoon",t:"Guten Tag"},
+{w:"Good evening",t:"Guten Abend"},
+{w:"Good night",t:"Gute Nacht"},
+{w:"Hello",t:"Hallo"},
+
+{w:"Hi",t:"Hi"},
+{w:"Goodbye",t:"Auf Wiedersehen"},
+{w:"See you later",t:"Bis später"},
+{w:"See you soon",t:"Bis bald"},
+{w:"Take care",t:"Mach's gut"},
+
+{w:"What is your name?",t:"Wie heißt du?"},
+{w:"My name is...",t:"Ich heiße..."},
+{w:"Nice to meet you",t:"Freut mich, dich kennenzulernen"},
+{w:"Where are you from?",t:"Woher kommst du?"},
+{w:"I am from Germany",t:"Ich komme aus Deutschland"},
+
+{w:"How old are you?",t:"Wie alt bist du?"},
+{w:"I am ... years old",t:"Ich bin ... Jahre alt"},
+{w:"Do you speak English?",t:"Sprichst du Englisch?"},
+{w:"I understand",t:"Ich verstehe"},
+{w:"I don't understand",t:"Ich verstehe nicht"},
+
+{w:"Please speak slowly",t:"Bitte sprich langsam"},
+{w:"Can you repeat that?",t:"Kannst du das wiederholen?"},
+{w:"What does that mean?",t:"Was bedeutet das?"},
+{w:"How do you say this in English?",t:"Wie sagt man das auf Englisch?"},
+{w:"I don't know",t:"Ich weiß es nicht"},
+
+{w:"Of course",t:"Natürlich"},
+{w:"Maybe",t:"Vielleicht"},
+{w:"Yes",t:"Ja"},
+{w:"No",t:"Nein"},
+{w:"Why?",t:"Warum?"},
+
+{w:"Because",t:"Weil"},
+{w:"What are you doing?",t:"Was machst du?"},
+{w:"I am working",t:"Ich arbeite"},
+{w:"I am learning",t:"Ich lerne"},
+{w:"I am going home",t:"Ich gehe nach Hause"},
+
+{w:"Come with me",t:"Komm mit mir"},
+{w:"Wait a moment",t:"Warte einen Moment"},
+{w:"Hurry up",t:"Beeil dich"},
+{w:"Stop",t:"Stopp"},
+{w:"Look",t:"Schau"},
+
+{w:"Listen",t:"Hör zu"},
+{w:"Be careful",t:"Sei vorsichtig"},
+{w:"No problem",t:"Kein Problem"},
+{w:"Sorry",t:"Entschuldigung"},
+{w:"Excuse me",t:"Entschuldigung"},
+
+{w:"Thank you very much",t:"Vielen Dank"},
+{w:"You're welcome",t:"Gern geschehen"},
+{w:"I agree",t:"Ich stimme zu"},
+{w:"I disagree",t:"Ich bin nicht einverstanden"},
+{w:"Let's go",t:"Lass uns gehen"}
+
+],
+
+reisen: [
+
+{w:"Map",t:"Karte"},
+{w:"City center",t:"Stadtzentrum"},
+{w:"Address",t:"Adresse"},
+{w:"Street",t:"Straße"},
+{w:"Corner",t:"Ecke"},
+{w:"Crossing",t:"Kreuzung"},
+{w:"Traffic light",t:"Ampel"},
+
+{w:"Hotel room",t:"Hotelzimmer"},
+{w:"Key",t:"Schlüssel"},
+{w:"Reception",t:"Rezeption"},
+{w:"Elevator",t:"Aufzug"},
+{w:"Stairs",t:"Treppe"},
+{w:"Breakfast",t:"Frühstück"},
+{w:"Dinner",t:"Abendessen"},
+
+{w:"Restaurant",t:"Restaurant"},
+{w:"Table for two",t:"Tisch für zwei"},
+{w:"Menu",t:"Speisekarte"},
+{w:"Bill please",t:"Die Rechnung bitte"},
+{w:"Water",t:"Wasser"},
+{w:"Coffee",t:"Kaffee"},
+{w:"Beer",t:"Bier"},
+
+{w:"Open",t:"Geöffnet"},
+{w:"Closed",t:"Geschlossen"},
+{w:"Entrance",t:"Eingang"},
+{w:"Exit",t:"Ausgang"},
+{w:"Information",t:"Information"},
+{w:"Police",t:"Polizei"},
+{w:"Hospital",t:"Krankenhaus"},
+
+{w:"Pharmacy",t:"Apotheke"},
+{w:"Doctor",t:"Arzt"},
+{w:"Emergency",t:"Notfall"},
+{w:"Call a doctor",t:"Rufen Sie einen Arzt"},
+{w:"I am lost",t:"Ich habe mich verlaufen"},
+{w:"Can you show me?",t:"Können Sie es mir zeigen?"},
+{w:"Is it far?",t:"Ist es weit?"},
+
+{w:"How long does it take?",t:"Wie lange dauert es?"},
+{w:"Minutes",t:"Minuten"},
+{w:"Hours",t:"Stunden"},
+{w:"Today",t:"Heute"},
+{w:"Tomorrow",t:"Morgen"},
+{w:"Now",t:"Jetzt"},
+
+{w:"Late",t:"Spät"},
+{w:"Early",t:"Früh"},
+{w:"Ticket office",t:"Fahrkartenschalter"},
+{w:"Platform",t:"Bahnsteig"},
+{w:"Seat",t:"Sitzplatz"},
+{w:"Reservation",t:"Reservierung"},
+{w:"Full",t:"Ausgebucht"},
+{w:"Available",t:"Verfügbar"}
+
+
+],
+
+
+essen: 
+[
+{w:"I am hungry",t:"Ich habe Hunger"},
+{w:"Water",t:"Wasser"},
+{w:"Coffee",t:"Kaffee"},
+{w:"Menu",t:"Speisekarte"},
+{w:"Bill please",t:"Rechnung bitte"},
+
+{w:"I am thirsty",t:"Ich habe Durst"},
+{w:"Tea",t:"Tee"},
+{w:"Juice",t:"Saft"},
+{w:"Beer",t:"Bier"},
+{w:"Wine",t:"Wein"},
+
+{w:"Can I have water?",t:"Kann ich Wasser haben?"},
+{w:"Can I have a coffee?",t:"Kann ich einen Kaffee haben?"},
+{w:"Can I see the menu?",t:"Kann ich die Speisekarte sehen?"},
+{w:"Do you have a table?",t:"Haben Sie einen Tisch frei?"},
+{w:"A table for two, please",t:"Einen Tisch für zwei, bitte"},
+
+{w:"What do you recommend?",t:"Was empfehlen Sie?"},
+{w:"I would like this",t:"Ich hätte gern das hier"},
+{w:"I would like to order",t:"Ich möchte bestellen"},
+{w:"Can I order now?",t:"Kann ich jetzt bestellen?"},
+{w:"We are ready to order",t:"Wir sind bereit zu bestellen"},
+
+{w:"Starter",t:"Vorspeise"},
+{w:"Main course",t:"Hauptgericht"},
+{w:"Dessert",t:"Nachspeise"},
+{w:"Breakfast",t:"Frühstück"},
+{w:"Lunch",t:"Mittagessen"},
+
+{w:"Dinner",t:"Abendessen"},
+{w:"Vegetarian",t:"Vegetarisch"},
+{w:"Vegan",t:"Vegan"},
+{w:"With meat",t:"Mit Fleisch"},
+{w:"Without meat",t:"Ohne Fleisch"},
+
+{w:"Spicy",t:"Scharf"},
+{w:"Not spicy",t:"Nicht scharf"},
+{w:"Delicious",t:"Lecker"},
+{w:"Too salty",t:"Zu salzig"},
+{w:"Too sweet",t:"Zu süß"},
+
+{w:"Can I have some bread?",t:"Kann ich etwas Brot haben?"},
+{w:"Can I have some water?",t:"Kann ich etwas Wasser haben?"},
+{w:"Another coffee, please",t:"Noch einen Kaffee, bitte"},
+{w:"One more, please",t:"Noch eins, bitte"},
+{w:"That's all, thank you",t:"Das ist alles, danke"},
+
+{w:"Could we get the bill?",t:"Könnten wir die Rechnung bekommen?"},
+{w:"Do you accept cards?",t:"Akzeptieren Sie Karten?"},
+{w:"Cash",t:"Barzahlung"},
+{w:"Card",t:"Karte"},
+{w:"Tip",t:"Trinkgeld"},
+
+{w:"Keep the change",t:"Stimmt so"},
+{w:"Excuse me",t:"Entschuldigung"},
+{w:"Thank you",t:"Danke"},
+{w:"You're welcome",t:"Gern geschehen"},
+{w:"Cheers",t:"Prost"}
+
+],
+
+proverbs: [
+
+{w:"Time is money",t:"Zeit ist Geld"},
+{w:"Better late than never",t:"Besser spät als nie"},
+{w:"Practice makes perfect",t:"Übung macht den Meister"},
+{w:"Knowledge is power",t:"Wissen ist Macht"},
+{w:"A stitch in time saves nine",t:"Vorsorge ist besser als Nachsorge"},
+{w:"Actions speak louder than words",t:"Taten sagen mehr als Worte"},
+{w:"All good things come to those who wait",t:"Gut Ding will Weile haben"},
+{w:"All that glitters is not gold",t:"Nicht alles ist Gold, was glänzt"},
+{w:"An apple a day keeps the doctor away",t:"Vorbeugen ist besser als heilen"},
+
+{w:"Better safe than sorry",t:"Vorsicht ist besser als Nachsicht"},
+{w:"Birds of a feather flock together",t:"Gleich und gleich gesellt sich gern"},
+{w:"Blood is thicker than water",t:"Blut ist dicker als Wasser"},
+{w:"Brevity is the soul of wit",t:"In der Kürze liegt die Würze"},
+
+{w:"Don't count your chickens before they hatch",t:"Man soll den Tag nicht vor dem Abend loben"},
+{w:"Don't judge a book by its cover",t:"Beurteile nichts nach dem Äußeren"},
+{w:"Every cloud has a silver lining",t:"Alles hat auch seine gute Seite"},
+{w:"Every man has his price",t:"Jeder hat seinen Preis"},
+{w:"Fortune favors the bold",t:"Das Glück ist mit den Mutigen"},
+
+{w:"Give credit where credit is due",t:"Anerkennung gehört dem, der sie verdient"},
+{w:"Good things come to those who wait",t:"Geduld bringt Rosen"},
+{w:"Half a loaf is better than no bread",t:"Lieber den Spatz in der Hand als die Taube auf dem Dach"},
+{w:"Honesty is the best policy",t:"Ehrlichkeit währt am längsten"},
+{w:"Hope for the best, prepare for the worst",t:"Hoffe auf das Beste, bereite dich auf das Schlimmste vor"},
+
+{w:"If it ain't broke, don't fix it",t:"Wenn es funktioniert, repariere es nicht"},
+{w:"If you can't beat them, join them",t:"Wenn du sie nicht schlagen kannst, mach mit"},
+{w:"In for a penny, in for a pound",t:"Wer A sagt, muss auch B sagen"},
+{w:"It takes one to know one",t:"Der Gleich und Gleich erkennt sich"},
+{w:"It takes two to tango",t:"Zu einem Streit gehören zwei"},
+
+{w:"Laughter is the best medicine",t:"Lachen ist die beste Medizin"},
+{w:"Look before you leap",t:"Erst denken, dann handeln"},
+{w:"Make hay while the sun shines",t:"Man soll die Gelegenheit beim Schopf packen"},
+{w:"Money doesn't grow on trees",t:"Geld wächst nicht auf Bäumen"},
+
+{w:"Necessity is the mother of invention",t:"Not macht erfinderisch"},
+{w:"Nothing ventured, nothing gained",t:"Wer nicht wagt, der nicht gewinnt"},
+{w:"Old habits die hard",t:"Alte Gewohnheiten sterben schwer"},
+{w:"One good turn deserves another",t:"Eine gute Tat verdient eine andere"},
+
+{w:"Rome wasn't built in a day",t:"Rom wurde nicht an einem Tag erbaut"},
+{w:"Silence is golden",t:"Reden ist Silber, Schweigen ist Gold"},
+{w:"Slow and steady wins the race",t:"Stetig gewinnt das Rennen"},
+{w:"Strike while the iron is hot",t:"Man soll das Eisen schmieden, solange es heiß ist"},
+
+{w:"The early bird catches the worm",t:"Morgenstund hat Gold im Mund"},
+{w:"The grass is always greener on the other side",t:"Das Gras ist auf der anderen Seite immer grüner"},
+{w:"The pen is mightier than the sword",t:"Die Feder ist mächtiger als das Schwert"},
+{w:"There is no smoke without fire",t:"Wo Rauch ist, ist auch Feuer"},
+{w:"Time heals all wounds",t:"Die Zeit heilt alle Wunden"},
+
+{w:"Two heads are better than one",t:"Gemeinsam ist man stärker"},
+{w:"When in Rome, do as the Romans do",t:"Andere Länder, andere Sitten"},
+{w:"Where there is a will, there is a way",t:"Wo ein Wille ist, ist auch ein Weg"},
+{w:"You can't have your cake and eat it too",t:"Man kann nicht alles haben"},
+
+{w:"You reap what you sow",t:"Wie man sät, so erntet man"},
+{w:"Your guess is as good as mine",t:"Ich habe genauso wenig Ahnung wie du"},
+{w:"No pain, no gain",t:"Ohne Fleiß kein Preis"}
+
+]
+};
+
+let currentCategory = "basis";
+let index = 0;
+
+/* =========================
+   UI UPDATE
+========================= */
+function updateUI(){
+
+let map={
+basis:"Basiswissen",
+alltag:"Alltag",
+reisen:"Reisen",
+essen:"Essen",
+proverbs:"Sprichwörter"
+};
+
+document.getElementById("stateText").innerText = map[currentCategory];
+
+let total = data[currentCategory].length;
+document.getElementById("counterText").innerText = (index+1) + " / " + total;
+
+}
+
+/* =========================
+   LOGIK
+========================= */
+function loadCategory(cat){
+currentCategory = cat;
+index = 0;
+show(true);
+}
+
+function loadProverbs(){
+currentCategory = "proverbs";
+index = 0;
+show(true);
+}
+
+function show(speakNow){
+
+let c = data[currentCategory][index];
+
+document.getElementById("word").innerText = c.w;
+document.getElementById("phonetic").innerText = c.p || "";
+document.getElementById("translation").innerText = c.t;
+
+updateUI();
+
+if(speakNow) speakCard();
+}
+
+function nextCard(){
+index = (index + 1) % data[currentCategory].length;
+show(true);
+}
+
+function prevCard(){
+index = (index - 1 + data[currentCategory].length) % data[currentCategory].length;
+show(true);
+}
+
+function cardClick(){
+nextCard();
+}
+
+/* =========================
+   SPEECH ENGINE (SAUBER)
+========================= */
+function cleanSpeechText(text){
+return text
+.replace(/<[^>]*>/g," ")
+.replace(/\n/g," ")
+.replace(/\//g," ")
+.replace(/\s+/g," ")
+.trim();
+}
+
+function speak(text, lang="de-DE"){
+let clean = cleanSpeechText(text);
+
+let utter = new SpeechSynthesisUtterance(clean);
+utter.lang = lang;
+
+speechSynthesis.cancel();
+speechSynthesis.speak(utter);
+}
+
+function speakCard(){
+let text = document.getElementById("word").innerText;
+speak(text, currentLang);
+}
+
+/* =========================
+   OVERLAY
+========================= */
+function openImpressum(){
+document.getElementById("impressum").style.display="block";
+speak(document.getElementById("impText").innerText,"de-DE");
+}
+
+function openDatenschutz(){
+document.getElementById("datenschutz").style.display="block";
+speak(document.getElementById("dsText").innerText,"de-DE");
+}
+
+function closeOverlay(){
+document.getElementById("impressum").style.display="none";
+document.getElementById("datenschutz").style.display="none";
+}
+
+/* START */
+show(false);
+
+</script>
+
+</body>
+</html>
