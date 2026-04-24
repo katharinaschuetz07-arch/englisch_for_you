@@ -679,7 +679,15 @@ speak(document.getElementById("dsText").innerText,"de-DE");
 
 function closeOverlay(){
 document.getElementById("impressum").style.display="none";
+window.speechSynthesis.cancel();
+  
 document.getElementById("datenschutz").style.display="none";
+window.speechSynthesis.cancel();
+
+}
+
+  
+   
 /* START */
 show(false);
 
