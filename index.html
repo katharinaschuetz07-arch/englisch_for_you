@@ -672,30 +672,14 @@ document.getElementById("impressum").style.display="block";
 speak(document.getElementById("impText").innerText,"de-DE");
 }
 
-function closeImpressum() {
-    document.getElementById("impressum").style.display = "none";
-
-    // 🔇 WICHTIG: Sprachwiedergabe stoppen
-    window.speechSynthesis.cancel();
-}
-   
 function openDatenschutz(){
 document.getElementById("datenschutz").style.display="block";
 speak(document.getElementById("dsText").innerText,"de-DE");
 }
 
-   function closeDatenschutz() {
-    document.getElementById("datenschutz").style.display = "none";
-
-    // 🔇 WICHTIG: Sprachwiedergabe stoppen
-    window.speechSynthesis.cancel();
-}
-
 function closeOverlay(){
 document.getElementById("impressum").style.display="none";
 document.getElementById("datenschutz").style.display="none";
-}
-
 /* START */
 show(false);
 
