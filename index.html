@@ -667,19 +667,15 @@ speak(text, currentLang);
 /* =========================
    OVERLAY
 ========================= */
-function openImpressum(){
-document.getElementById("impressum").style.display="block";
-speak(document.getElementById("impText").innerText,"de-DE");
-}
 
-function openDatenschutz(){
-document.getElementById("datenschutz").style.display="block";
-speak(document.getElementById("dsText").innerText,"de-DE");
-}
-
-function closeOverlay(){
+   function closeOverlay(){
 document.getElementById("impressum").style.display="none";
+window.speechSynthesis.cancel();
+  
 document.getElementById("datenschutz").style.display="none";
+window.speechSynthesis.cancel();
+   
+
 }
 
 /* START */
